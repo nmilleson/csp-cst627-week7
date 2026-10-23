@@ -1,0 +1,27 @@
+{
+  "generator": "lora_ablation/data.py (synthetic, no external download)",
+  "generator_sha256": "761bdb9b308bf661f9f52a3317681ea0e4a422e626369ce61f8ead953ef34f3a",
+  "seed": 20260101,
+  "date_range": [
+    "2022-01-01",
+    "2024-12-31"
+  ],
+  "frequency": "hourly",
+  "units": {
+    "demand_mw": "MW",
+    "temperature_c": "deg C",
+    "temperature_forecast_c": "deg C"
+  },
+  "files": {
+    "source_coops.csv.gz": {
+      "sha256": "af1415e3a98a60f5bb2a5f6f32595254f51537ea6808f5d54bce7cb98713f019",
+      "rows": 631296,
+      "coops": 24
+    },
+    "target_coop.csv.gz": {
+      "sha256": "8aeccf926d5b848a19dacfdcfd0586b686d8ab076d508dca81a2628e82fa7132",
+      "rows": 26304,
+      "coops": 1
+    }
+  }
+}

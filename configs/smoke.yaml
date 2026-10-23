@@ -1,0 +1,35 @@
+# Tiny end-to-end check (~2-3 min on CPU). Same code path, fewer steps/series.
+# Outputs go to *_smoke directories so they never overwrite the real study.
+extends: ablation.yaml
+experiment_name: lora_rank_ablation_smoke
+
+paths:
+  data_dir: data_smoke
+  artifact_dir: artifacts_smoke
+  results_dir: results_smoke
+  report: results_smoke/Annex_IV_Technical_Documentation.md
+
+data:
+  n_source_coops: 4
+
+model:
+  d_model: 32
+  n_layers: 2
+  d_ff: 64
+
+pretrain:
+  steps: 60
+  batch_size: 64
+  eval_every: 30
+  val_stride_hours: 24
+
+ablation:
+  ranks: [1, 4, 16]
+  seeds: [0, 1, 2]
+  steps: 40
+  batch_size: 32
+  eval_every: 20
+  latency:
+    batch_sizes: [1, 64]
+    warmup_iters: 2
+    timed_iters: 5

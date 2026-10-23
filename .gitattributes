@@ -1,0 +1,4 @@
+# LF everywhere so file hashes (e.g. generator_sha256) match on Windows, macOS and Colab
+* text=auto eol=lf
+*.png binary
+*.gz binary

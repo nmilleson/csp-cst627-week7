@@ -1,0 +1,70 @@
+# LoRA-rank ablation for short-horizon (24 h) electricity-demand forecasting.
+# Every stage reads this file; every random draw is derived from a seed below.
+experiment_name: lora_rank_ablation
+
+paths:
+  data_dir: data
+  artifact_dir: artifacts     # base checkpoint (regenerable, git-ignored)
+  results_dir: results        # tables, plots, logs (committed)
+  report: docs/Annex_IV_Technical_Documentation.md  # rendered by stage 5
+
+data:
+  seed: 20260101              # master seed for the synthetic generator
+  start: "2022-01-01"
+  end: "2024-12-31"           # inclusive, hourly resolution
+  n_source_coops: 24          # half US, half Central-EU
+  # Source co-ops: pretraining data ends before the target window opens.
+  pretrain_train_end: "2024-06-01"
+  pretrain_val_end: "2024-08-01"
+  # Target co-op (Nordic EU, heat pumps + EV charging): the deployment shift.
+  target_train_start: "2024-08-01"
+  target_train_days: 90       # the small amount of history a new co-op brings
+  target_val_days: 14         # early-stopping / checkpoint selection only
+  target_test_days: 30        # never seen during training or selection
+
+window:
+  context_hours: 168          # one week of history
+  horizon_hours: 24           # day-ahead
+  eval_stride_hours: 1        # one forecast origin per hour in val/test
+
+model:
+  d_model: 128
+  n_heads: 4
+  n_layers: 4
+  d_ff: 256
+  dropout: 0.1
+
+pretrain:
+  seed: 0                     # base model is shared by every ablation arm
+  steps: 3000
+  batch_size: 256
+  lr: 1.0e-3
+  weight_decay: 0.01
+  warmup_steps: 200
+  eval_every: 250
+  val_stride_hours: 6
+
+ablation:
+  ranks: [1, 2, 4, 8, 16, 32]
+  seeds: [0, 1, 2, 3, 4]
+  include_zero_shot: true     # frozen base model, no adaptation (lower bracket)
+  include_full_finetune: true # all weights trainable (upper-cost bracket)
+  alpha_over_rank: 2.0        # alpha = 2r, so the LoRA scale alpha/r is constant across ranks
+  lora_dropout: 0.0
+  target_modules: [q_proj, k_proj, v_proj, out_proj, ff1, ff2]
+  steps: 800
+  batch_size: 128
+  lr: 2.0e-3                  # identical for every rank (see README: limitations)
+  full_finetune_lr: 2.0e-4
+  weight_decay: 0.0
+  warmup_steps: 50
+  eval_every: 50
+  latency:
+    batch_sizes: [1, 256]
+    warmup_iters: 10
+    timed_iters: 50
+
+analysis:
+  primary_metric: test_mape_pct
+  alpha: 0.05                 # family-wise error rate (Holm correction)
+  noise_multiplier: 2.0       # "exceeds noise" = |diff of means| > k * pooled seed std

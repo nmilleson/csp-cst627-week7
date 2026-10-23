@@ -1,0 +1,10 @@
+# Regenerable artefacts (scripts/01_make_data.py and 02_pretrain.py rebuild them)
+data/*.csv.gz
+artifacts/
+# Smoke-test outputs
+*_smoke/
+# Python / notebooks
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
