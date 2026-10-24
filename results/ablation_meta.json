@@ -1,0 +1,124 @@
+{
+  "config_hash": "6e2e71d9b599",
+  "config": {
+    "experiment_name": "lora_rank_ablation",
+    "paths": {
+      "data_dir": "data",
+      "artifact_dir": "artifacts",
+      "results_dir": "results",
+      "report": "docs/Annex_IV_Technical_Documentation.md"
+    },
+    "data": {
+      "seed": 20260101,
+      "start": "2022-01-01",
+      "end": "2024-12-31",
+      "n_source_coops": 24,
+      "pretrain_train_end": "2024-06-01",
+      "pretrain_val_end": "2024-08-01",
+      "target_train_start": "2024-08-01",
+      "target_train_days": 90,
+      "target_val_days": 14,
+      "target_test_days": 30
+    },
+    "window": {
+      "context_hours": 168,
+      "horizon_hours": 24,
+      "eval_stride_hours": 1
+    },
+    "model": {
+      "d_model": 128,
+      "n_heads": 4,
+      "n_layers": 4,
+      "d_ff": 256,
+      "dropout": 0.1
+    },
+    "pretrain": {
+      "seed": 0,
+      "steps": 3000,
+      "batch_size": 256,
+      "lr": 0.001,
+      "weight_decay": 0.01,
+      "warmup_steps": 200,
+      "eval_every": 250,
+      "val_stride_hours": 6
+    },
+    "ablation": {
+      "ranks": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "include_zero_shot": true,
+      "include_full_finetune": true,
+      "alpha_over_rank": 2.0,
+      "lora_dropout": 0.0,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "out_proj",
+        "ff1",
+        "ff2"
+      ],
+      "steps": 800,
+      "batch_size": 128,
+      "lr": 0.002,
+      "full_finetune_lr": 0.0002,
+      "weight_decay": 0.0,
+      "warmup_steps": 50,
+      "eval_every": 50,
+      "latency": {
+        "batch_sizes": [
+          1,
+          256
+        ],
+        "warmup_iters": 10,
+        "timed_iters": 50
+      }
+    },
+    "analysis": {
+      "primary_metric": "test_mape_pct",
+      "alpha": 0.05,
+      "noise_multiplier": 2.0
+    }
+  },
+  "environment": {
+    "python": "3.13.16",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "cudnn": 92700,
+    "gpu": "Tesla T4",
+    "gpu_total_memory_mb": 14913,
+    "numpy": "2.4.2",
+    "pandas": "3.0.2",
+    "scipy": "1.17.1",
+    "matplotlib": "3.10.8",
+    "pyyaml": "6.0.3",
+    "git_commit": "b564b72"
+  },
+  "splits": {
+    "train": [
+      "2024-08-01 00:00:00",
+      "2024-10-30 00:00:00"
+    ],
+    "val": [
+      "2024-10-30 00:00:00",
+      "2024-11-13 00:00:00"
+    ],
+    "test": [
+      "2024-11-13 00:00:00",
+      "2024-12-13 00:00:00"
+    ]
+  }
+}

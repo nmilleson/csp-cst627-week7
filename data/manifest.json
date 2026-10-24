@@ -14,12 +14,12 @@
   },
   "files": {
     "source_coops.csv.gz": {
-      "sha256": "af1415e3a98a60f5bb2a5f6f32595254f51537ea6808f5d54bce7cb98713f019",
+      "sha256": "75a0099458e2cdeba84fc86b128b0880010c84743c2219bf15aa35d13a24c0cf",
       "rows": 631296,
       "coops": 24
     },
     "target_coop.csv.gz": {
-      "sha256": "8aeccf926d5b848a19dacfdcfd0586b686d8ab076d508dca81a2628e82fa7132",
+      "sha256": "8d73955277cf417791393fe21fbfcd480e5bacf337424b498c695f4478691c65",
       "rows": 26304,
       "coops": 1
     }

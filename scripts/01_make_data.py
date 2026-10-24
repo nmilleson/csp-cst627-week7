@@ -1,9 +1,13 @@
 """Stage 1 - generate the synthetic co-op demand dataset and its provenance manifest.
 
-Deterministic: the same config seed always produces byte-identical files. If a
-manifest already exists, the new hashes are checked against it and the result
-is reported (MATCH / MISMATCH) before it is overwritten.
+Deterministic: the same config seed always produces the same CSV content. The
+manifest records two hashes per file: `content_sha256` (the uncompressed CSV
+text, comparable across platforms) and `sha256` (the .gz file, which can differ
+between zlib builds even for identical content). If a manifest already exists,
+the content hashes are checked against it and MATCH / MISMATCH is reported
+before it is overwritten.
 """
+import hashlib
 import json
 import time
 
@@ -37,16 +41,19 @@ def main(argv=None):
     for name, df in files.items():
         path = data_dir / name
         df.to_csv(path, index=False, compression={"method": "gzip", "mtime": 0})
+        content = hashlib.sha256(df.to_csv(index=False, lineterminator="\n").encode()).hexdigest()
         manifest["files"][name] = {
-            "sha256": sha256_file(path), "rows": len(df), "coops": int(df.coop_id.nunique()),
+            "content_sha256": content, "sha256": sha256_file(path),
+            "rows": len(df), "coops": int(df.coop_id.nunique()),
         }
-        print(f"wrote {path.relative_to(data_dir.parent)}  rows={len(df):,}  sha256={manifest['files'][name]['sha256'][:16]}")
+        print(f"wrote {path.relative_to(data_dir.parent)}  rows={len(df):,}  content_sha256={content[:16]}")
     write_json(manifest, manifest_path)
     write_json(card, data_dir / "data_card.json")
 
     if previous:
-        same = all(previous["files"].get(k, {}).get("sha256") == v["sha256"] for k, v in manifest["files"].items())
-        print("Reproducibility check vs previous manifest:", "MATCH" if same else "MISMATCH")
+        key = "content_sha256" if all("content_sha256" in f for f in previous["files"].values()) else "sha256"
+        same = all(previous["files"].get(k, {}).get(key) == v[key] for k, v in manifest["files"].items())
+        print(f"Reproducibility check vs previous manifest ({key}):", "MATCH" if same else "MISMATCH")
     plots.data_overview(source, target, results_dir / "fig_data_overview.png", cfg["data"]["target_train_start"])
     print(f"config {config_hash(cfg)}  done in {time.perf_counter() - t0:.1f}s")
 

@@ -1,4 +1,4 @@
-# Fully pinned environment (Python 3.11-3.12). Local CPU or CUDA machine.
+# Fully pinned environment (Python 3.11-3.13). Local CPU or CUDA machine.
 # For a CUDA wheel use: pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cu126
 -r requirements-colab.txt
 torch==2.14.0

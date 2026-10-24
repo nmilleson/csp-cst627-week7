@@ -49,6 +49,35 @@ def main(argv=None):
     sig = pd.read_csv(res / "significance.csv")
     env, d, a = meta["environment"], cfg["data"], cfg["ablation"]
 
+    files = manifest["files"]
+    if all("content_sha256" in f for f in files.values()):
+        hash_note = (f"Content SHA-256 (uncompressed CSV, comparable across platforms): `source_coops` "
+                     f"`{files['source_coops.csv.gz']['content_sha256'][:16]}`, `target_coop` "
+                     f"`{files['target_coop.csv.gz']['content_sha256'][:16]}`.")
+    else:
+        hash_note = (f"The manifest of this run records hashes of the gzip files only (`source_coops` "
+                     f"`{files['source_coops.csv.gz']['sha256'][:16]}`, `target_coop` "
+                     f"`{files['target_coop.csv.gz']['sha256'][:16]}`). These match on reruns on the same "
+                     f"platform but differ between zlib builds, so they are not a cross-platform check. Stage 1 "
+                     f"now also records a hash of the uncompressed content for that purpose.")
+
+    runs = pd.read_csv(res / "runs.csv")
+    adapted = runs[runs.method != "none"]
+    first = (adapted.best_step <= a["eval_every"]).mean()
+    if first >= 0.5:
+        granularity_note = (
+            f"In this run, {first:.0%} of adapted runs reached their best validation loss at the first checkpoint "
+            f"(step {a['eval_every']}, the end of the {a['warmup_steps']}-step warm-up). After that, validation loss "
+            f"rose while training loss kept falling. The comparison is therefore effectively \"each rank after about "
+            f"{a['eval_every']} steps\". Higher ranks fit, and over-fit, faster, and their best checkpoint may lie "
+            f"before step {a['eval_every']}, which this evaluation grid cannot resolve. The advantage of low ranks is "
+            f"therefore confounded with checkpoint granularity and the fixed learning rate. A follow-up with "
+            f"validation every 5–10 steps, or a lower learning rate, is needed before treating it as a pure capacity "
+            f"effect.")
+    else:
+        granularity_note = (f"Validation runs every {a['eval_every']} steps, so each arm's best checkpoint is "
+                            f"located only to that resolution.")
+
     n = len(a["seeds"])
     df = 2 * n - 2
     mde_sd = (stats.t.ppf(0.975, df) + stats.t.ppf(0.80, df)) * np.sqrt(2 / n)
@@ -75,6 +104,7 @@ def main(argv=None):
         "accuracy_table": rv["accuracy_table"], "cost_table": rv["cost_table"],
         "significance_table": rv["significance_table"], "verdict_md": rv["verdict_md"],
         "recommendation": recommendation(summary, sig, rv),
+        "hash_note": hash_note, "granularity_note": granularity_note,
         "mde_sd": f"{mde_sd:.1f}", "mde_pp": f"{mde_sd * rv['median_seed_sd']:.2f}",
     }
     template = Template((ROOT / "docs/templates/annex_iv_template.md").read_text(encoding="utf-8"))

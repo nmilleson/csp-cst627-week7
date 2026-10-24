@@ -1,0 +1,31 @@
+{
+  "config_hash": "6e2e71d9b599",
+  "params": 556289,
+  "best_step": 3000,
+  "best_val_loss": 0.016256238854717362,
+  "source_val_metrics": {
+    "test_mae_mw": 0.6478300094604492,
+    "test_rmse_mw": 1.0031136274337769,
+    "test_mape_pct": 1.5865739583969116,
+    "test_peak_err_pct": 1.3038331270217896
+  },
+  "train_time_s": 453.06863060800003,
+  "peak_mem_mb": 1402.12890625,
+  "checkpoint_sha256": "51becb08fec17700ace363713594ff61bd63e7ee1cee0fc1807f64e23311ed04",
+  "data_manifest_sha256": "ba71446eec6a5b3d2c194ebe9ab43679bfe48a9ba7941b83380bd3b26bc39d20",
+  "environment": {
+    "python": "3.13.16",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "cudnn": 92700,
+    "gpu": "Tesla T4",
+    "gpu_total_memory_mb": 14913,
+    "numpy": "2.4.2",
+    "pandas": "3.0.2",
+    "scipy": "1.17.1",
+    "matplotlib": "3.10.8",
+    "pyyaml": "6.0.3",
+    "git_commit": "b564b72"
+  }
+}
